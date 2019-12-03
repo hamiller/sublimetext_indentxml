@@ -10,5 +10,9 @@
     {
         "caption": "Indent JSON",
         "command": "indent_json"
+    },
+    {
+        "caption": "Indent PLAIN",
+        "command": "indent_plain"
     }    
 ]

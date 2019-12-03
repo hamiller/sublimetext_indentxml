@@ -27,10 +27,11 @@ class BaseIndentCommand(sublime_plugin.TextCommand):
         'Plain Text'. This helps clarify to the user about when the command can
         be executed, especially useful for UI controls.
         """
-        if self.view is None:
-            return False
+        # if self.view is None:
+        #     return False
 
-        return self.check_enabled(self.get_language())
+        # return self.check_enabled(self.get_language())
+        return True
 
     def run(self, edit):
         """
@@ -38,6 +39,7 @@ class BaseIndentCommand(sublime_plugin.TextCommand):
         """
         view = self.view
         regions = view.sel()
+
         # if there are more than 1 region or region one and it's not empty
         if len(regions) > 1 or not regions[0].empty():
             for region in view.sel():
@@ -68,6 +70,7 @@ class AutoIndentCommand(BaseIndentCommand):
                 return 'xml'
             if s[0] == '{' or s[0] == '[':
                 return 'json'
+            return 'plain'
 
         return 'notsupported'
 
@@ -77,6 +80,8 @@ class AutoIndentCommand(BaseIndentCommand):
             command = IndentXmlCommand(self.view)
         if text_type == 'json':
             command = IndentJsonCommand(self.view)
+        if text_type == 'plain':
+            command = IndentPlaintextCommand(self.view)
         if text_type == 'notsupported':
             return s
 
@@ -124,3 +129,29 @@ class IndentJsonCommand(BaseIndentCommand):
     def indent(self, s):
         parsed = json.loads(s)
         return json.dumps(parsed, sort_keys=True, indent=4, separators=(',', ': '), ensure_ascii=False)
+
+class IndentPlainCommand(BaseIndentCommand):
+    def check_enabled(self, language):
+        return true
+
+    def indent(self, s):
+        newS = ""
+        increment = 0
+        for c in s:
+            newS = newS + c
+            if c == ("[" or "{"):
+                increment = increment +1
+                newS = newS + "\n" + self.addTabs(increment)
+            if c == ("]" or "}"):
+                increment = increment -1
+                newS = newS + "\n" + self.addTabs(increment)
+            if c == ("," or ";"):
+                newS = newS + "\n" + self.addTabs(increment)
+            
+        return newS
+
+    def addTabs(self, tabs):
+        s = ""
+        for i in range(tabs):
+            s = s + "\t"
+        return s
